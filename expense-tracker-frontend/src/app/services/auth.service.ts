@@ -27,12 +27,23 @@ export class AuthService {
     return localStorage.getItem('userId') !== null;
   }
 
+   // Update Max Monthly Expenses
+   updateMaxExpenses(newMaxExpenses: number): Observable<any> {
+    let userId = localStorage.getItem('userId');
+    return this.http.post<any>(`${this.baseUrl}/users/update-max-expenses/${userId}/${newMaxExpenses}`, {});
+  }
+
   // Set user data in localStorage after successful login or registration
   setUserData(user: User): void {
     localStorage.setItem('userId', user.id);
     localStorage.setItem('username', user.username);
     localStorage.setItem('maxMonthlyExpenses', user.maxMonthlyExpenses.toString());
     localStorage.setItem('currentMonthlyExpenses', user.currentMonthlyExpenses.toString());
+  }
+
+  updateUserData(field: string,value:string): void {
+    localStorage.removeItem(field);
+    localStorage.setItem(field, value);
   }
 
   // Clear user data from localStorage (for logout)

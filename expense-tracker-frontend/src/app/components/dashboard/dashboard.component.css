@@ -21,4 +21,24 @@
   .logout-btn:hover {
     background-color: #e64a3d;
   }
+.my-state-container {
+    background-color: #f9fafb;
+  }
+  
+  ul {
+    list-style-type: none;
+  }
+  
+  li {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  li:last-child {
+    border-bottom: none;
+  }
+  
+  .text-green-500 {
+    color: #10b981;
+  }
   
