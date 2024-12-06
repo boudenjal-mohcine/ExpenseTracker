@@ -1,0 +1,20 @@
+<div class="register-container">
+    <h2>Register</h2>
+    <form (ngSubmit)="register()">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" [(ngModel)]="username" name="username" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" [(ngModel)]="password" name="password" required />
+      </div>
+      <div class="form-group">
+        <label for="maxMonthlyExpenses">Max Monthly Expenses</label>
+        <input type="number" id="maxMonthlyExpenses" [(ngModel)]="maxMonthlyExpenses" name="maxMonthlyExpenses" required />
+      </div>
+      <button type="submit">Register</button>
+    </form>
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+  </div>
+  

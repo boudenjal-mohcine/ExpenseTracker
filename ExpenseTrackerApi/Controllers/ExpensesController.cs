@@ -65,7 +65,6 @@ namespace ExpenseTracker.Controllers
             };
 
             return Ok(returnExpense);
-
         }
 
         // Endpoint: Create a new expense

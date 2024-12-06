@@ -26,7 +26,18 @@ namespace ExpenseTracker.Controllers
             }
 
             await _userService.CreateUserAsync(user);
-            return Ok("User registered successfully.");
+            return Ok(new
+            {
+                Message = "Register successful",
+                User = new
+                {
+                    Id = user.Id.ToString(),
+                    Username = user.Username,
+                    MaxMonthlyExpenses = user.MaxMonthlyExpenses,
+                    CurrentMonthlyExpenses = 0
+
+                }
+            });
         }
 
         // Login
@@ -53,14 +64,9 @@ namespace ExpenseTracker.Controllers
                 {
                     Id = existingUser.Id.ToString(),
                     Username = existingUser.Username,
-                    //Expenses = existingUser.Expenses,
                     MaxMonthlyExpenses = existingUser.MaxMonthlyExpenses,
                     CurrentMonthlyExpenses = CurrentMonthlyExpenses ?? 0
-                    // Categories = existingUser.Categories.Select(category => new
-                    // {
-                    //     Id = category.Id.ToString(),
-                    //     category.Name,
-                    // }).ToList()
+
                 }
             });
         }

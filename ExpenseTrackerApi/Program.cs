@@ -24,6 +24,17 @@ builder.Services.AddSingleton(sp =>
     return client.GetDatabase("ExpenseTrackerDb");
 });
 
+ builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowSpecificOrigin", policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")  // The frontend URL
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+    });
+
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
@@ -46,4 +57,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.UseCors("AllowSpecificOrigin");
 app.Run();

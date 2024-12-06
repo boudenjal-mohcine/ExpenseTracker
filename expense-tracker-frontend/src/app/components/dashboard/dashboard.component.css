@@ -1,0 +1,24 @@
+.dashboard-container {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .user-info {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+  
+  .logout-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .logout-btn:hover {
+    background-color: #e64a3d;
+  }
+  
