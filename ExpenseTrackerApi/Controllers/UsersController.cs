@@ -70,5 +70,32 @@ namespace ExpenseTracker.Controllers
                 }
             });
         }
+
+        [HttpPost("update-max-expenses/{userId}/{newMaxExpenses}")]
+        public async Task<ActionResult> UpdateMaxMonthlyExpenses(string userId, decimal newMaxExpenses)
+        {
+            // Ensure the newMaxExpenses is valid
+            if (newMaxExpenses <= 0)
+            {
+                return BadRequest("MaxMonthlyExpenses must be greater than 0.");
+            }
+
+            // Retrieve the existing user by userId
+            var existingUser = await _userService.GetUserByIdAsync(userId);
+            if (existingUser == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Update the user's MaxMonthlyExpenses
+            existingUser.MaxMonthlyExpenses = newMaxExpenses;
+            await _userService.UpdateUserAsync(existingUser);
+
+            return Ok(new
+            {
+                Message = "Max Monthly Expenses updated successfully"
+            });
+        }
+
     }
 }

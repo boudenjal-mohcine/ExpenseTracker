@@ -1,16 +1,37 @@
-<div class="login-container">
-    <h2>Login</h2>
+<div class="login-container max-w-sm mx-auto p-6 bg-white rounded-lg shadow-lg margin-auto mt-12">
+    <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
     <form (ngSubmit)="login()">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" [(ngModel)]="username" name="username" required />
+      <div class="form-group mb-4">
+        <label for="username" class="block text-sm font-semibold text-gray-700">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          [(ngModel)]="username" 
+          name="username" 
+          required 
+          class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
       </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" [(ngModel)]="password" name="password" required />
+      <div class="form-group mb-6">
+        <label for="password" class="block text-sm font-semibold text-gray-700">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          [(ngModel)]="password" 
+          name="password" 
+          required 
+          class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
       </div>
-      <button type="submit">Login</button>
+      <button 
+        type="submit" 
+        class="w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+        Login
+      </button>
+      <div class="mt-5 text-primary">      <a href="/register">Register here</a>
+      </div>
     </form>
-    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+    <p *ngIf="errorMessage" class="error text-red-500 text-sm mt-4 text-center">{{ errorMessage }}</p>
   </div>
   

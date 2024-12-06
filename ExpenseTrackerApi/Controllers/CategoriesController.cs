@@ -65,8 +65,6 @@ namespace ExpenseTracker.Controllers
             {
                 Id = category.Id.ToString(),
                 category.Name
-                //category.Expenses,
-                //category.UserId
             }).ToList());
         }
 
@@ -87,11 +85,12 @@ namespace ExpenseTracker.Controllers
                 return BadRequest("Category already exists.");
             }
 
-            await _categoryService.CreateCategoryAsync(category);
-
             // Set the UserId before saving the category
             category.UserId = userId;
             category.User = user;
+            await _categoryService.CreateCategoryAsync(category);
+
+
 
             user.Categories.Add(category);
 

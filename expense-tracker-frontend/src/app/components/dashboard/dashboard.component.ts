@@ -49,6 +49,8 @@ export class DashboardComponent implements OnInit {
   description: string = '';
   expenses: Expense[] = [];
   chartInstance: Chart | null = null;
+  showModal: boolean = false; // Tracks whether the modal is shown or not
+  selectedExpense: Expense | null = null; // Stores the selected expense to display
 
   constructor(
     private authService: AuthService,
@@ -99,7 +101,7 @@ export class DashboardComponent implements OnInit {
       this.expensesPercentage =
         (this.currentMonthlyExpenses / this.maxMonthlyExpenses) * 100;
     } else {
-      this.router.navigate(['/login']); // Redirect to login if user is not authenticated
+      this.router.navigate(['/login']); 
     }
   }
 
@@ -193,7 +195,8 @@ export class DashboardComponent implements OnInit {
   // View expense details (example functionality)
   viewExpense(expense: Expense): void {
     console.log('Viewing expense:', expense);
-    // Implement the logic to view the expense details (e.g., navigate to another page or show a modal)
+    this.selectedExpense = expense; // Store the selected expense
+    this.showModal = true; // Show the modal
   }
 
   // Delete an expense
@@ -288,5 +291,10 @@ export class DashboardComponent implements OnInit {
         });
       }
     }
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+    this.selectedExpense = null;
   }
 }
