@@ -14,7 +14,7 @@ namespace ExpenseTracker.Data
         }
 
         public async Task<User> GetUserByIdAsync(string id) =>
-            await _users.Find(user => user.Id == id).FirstOrDefaultAsync();
+            await _users.Find(user => user.Id.ToString() == id).FirstOrDefaultAsync();
 
         public async Task<User> GetUserByUsernameAsync(string username) =>
             await _users.Find(user => user.Username == username).FirstOrDefaultAsync();

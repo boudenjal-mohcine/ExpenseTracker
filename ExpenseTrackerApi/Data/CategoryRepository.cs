@@ -15,7 +15,7 @@ namespace ExpenseTracker.Data
         }
 
         public async Task<Category> GetCategoryByIdAsync(string id) =>
-            await _categories.Find(category => category.Id == id).FirstOrDefaultAsync();
+            await _categories.Find(category => category.Id.ToString() == id).FirstOrDefaultAsync();
 
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync() =>
             await _categories.Find(_ => true).ToListAsync();

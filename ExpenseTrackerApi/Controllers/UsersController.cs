@@ -1,7 +1,6 @@
 using ExpenseTracker.Models;
 using ExpenseTracker.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace ExpenseTracker.Controllers
 {
@@ -16,7 +15,7 @@ namespace ExpenseTracker.Controllers
             _userService = userService;
         }
 
-        // Endpoint: Register a new user
+        // Register a new user
         [HttpPost("register")]
         public async Task<ActionResult> Register(User user)
         {
@@ -30,32 +29,32 @@ namespace ExpenseTracker.Controllers
             return Ok("User registered successfully.");
         }
 
-        // Endpoint: Login
+        // Login
         [HttpPost("login")]
-        public async Task<ActionResult> Login(string username, string password)
+        public async Task<ActionResult> Login(User user)
         {
-            var user = await _userService.GetUserByUsernameAsync(username);
-           
-            // Verify password
-            if (user == null)
+            if (user == null || string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Password))
             {
-                    return Unauthorized("Invalid username or password.");
+                return BadRequest("Username and password are required.");
             }
 
-            return Ok(new { Message = "Login successful", User = user });
-        }
+            var existingUser = await _userService.GetUserByUsernameAsync(user.Username);
 
-        // Endpoint: Get a user by ID
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUserById(string id)
-        {
-            var user = await _userService.GetUserByIdAsync(id);
-            if (user == null)
+            if (existingUser == null || user.Password != existingUser.Password)
             {
-                return NotFound();
+                return Unauthorized("Invalid username or password.");
             }
 
-            return Ok(user);
+            return Ok(new
+            {
+                Message = "Login successful",
+                User = new
+                {
+                    Id = existingUser.Id.ToString(),
+                    Username = existingUser.Username,
+                    Expenses = existingUser.Expenses
+                }
+            });
         }
     }
 }
