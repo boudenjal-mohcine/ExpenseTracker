@@ -42,3 +42,9 @@
     color: #10b981;
   }
   
+#pieChartDiv {
+    width: 500px;
+    height: 500px;
+    margin: auto;
+}
+  

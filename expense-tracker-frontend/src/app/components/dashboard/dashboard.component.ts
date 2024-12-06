@@ -7,6 +7,8 @@ import { Category } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
 import { Expense } from '../../models/expense.model';
 import { ExpenseService } from '../../services/expense.service';
+import { Chart, ArcElement, Tooltip, Legend, Title, CategoryScale, LinearScale, PieController } from 'chart.js';
+Chart.register(ArcElement, Tooltip, Legend, Title, CategoryScale, LinearScale, PieController);
 
 @Component({
   selector: 'app-dashboard',
@@ -49,6 +51,7 @@ export class DashboardComponent implements OnInit {
     this.expenseService.getExpenses(this.userId).subscribe(
       (data: Expense[]) => {
         this.expenses = data; 
+        this.updateChart(); 
       },
       (error) => {
         console.error('Error fetching expenses:', error);
@@ -62,6 +65,7 @@ export class DashboardComponent implements OnInit {
         .getCategories(this.userId)
         .subscribe((categories: Category[]) => {
           this.categories = categories;
+          this.updateChart(); 
         });
     }
   }
@@ -158,6 +162,53 @@ export class DashboardComponent implements OnInit {
   getCategoryName(categoryId: string): string {
     const category = this.categories.find(c => c.id === categoryId);
     return category ? category.name : 'Unknown';
+  }
+
+  //chart
+  updateChart(): void {
+    if (this.expenses.length > 0 && this.categories.length > 0) {
+      // Group expenses by categoryId
+      const categoryExpenses = this.categories.map(category => {
+        const totalAmount = this.expenses
+          .filter(expense => expense.categoryId === category.id)
+          .reduce((sum, expense) => sum + expense.amount, 0);
+        return { category: category.name, totalAmount };
+      });
+
+      // Data for the pie chart
+      const chartData = {
+        labels: categoryExpenses.map(exp => exp.category),
+        datasets: [{
+          data: categoryExpenses.map(exp => exp.totalAmount),
+          backgroundColor: ['#FF5733', '#33FF57', '#3357FF', '#FFC300', '#FF33A1'], // Customize colors
+        }]
+      };
+
+      // Create or update the pie chart
+      const ctx = (document.getElementById('pieChart') as HTMLCanvasElement).getContext('2d');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'pie',
+          data: chartData,
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+              },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const value = context.raw;
+                    return `${context.label}: $${value}`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }
   }
   
 }
