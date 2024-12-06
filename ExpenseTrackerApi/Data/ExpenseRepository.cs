@@ -15,7 +15,7 @@ namespace ExpenseTracker.Data
         }
 
         public async Task<IEnumerable<Expense>> GetAllExpensesByUserIdAsync(string userId) =>
-            await _expenses.Find(expense => expense.UserId == userId).ToListAsync();
+            await _expenses.Find(expense => expense.Id == userId).ToListAsync();
 
         public async Task<Expense> GetExpenseByIdAsync(string id) =>
             await _expenses.Find(expense => expense.Id == id).FirstOrDefaultAsync();
