@@ -21,5 +21,11 @@ namespace ExpenseTracker.Models
 
         [BsonIgnore]
         public Category? Category { get; set; }
+        
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? UserId { get; set; }
+
+        [BsonIgnore]
+        public Category? User { get; set; }
     }
 }

@@ -22,5 +22,10 @@ namespace ExpenseTracker.Services
 
         public async Task CreateCategoryAsync(Category category) =>
             await _categoryRepository.CreateCategoryAsync(category);
+
+         public async Task UpdateCategoryAsync(Category category)
+        {
+            await _categoryRepository.UpdateCategoryAsync(category);
+        }
     }
 }

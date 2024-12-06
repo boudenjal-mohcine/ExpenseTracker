@@ -64,9 +64,9 @@ namespace ExpenseTracker.Controllers
             return Ok(categories.Select(category => new
             {
                 Id = category.Id.ToString(),
-                category.Name,
-                category.Expenses,
-                category.UserId
+                category.Name
+                //category.Expenses,
+                //category.UserId
             }).ToList());
         }
 

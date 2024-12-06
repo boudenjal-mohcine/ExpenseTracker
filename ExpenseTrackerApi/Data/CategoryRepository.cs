@@ -28,5 +28,12 @@ namespace ExpenseTracker.Data
         public async Task CreateCategoryAsync(Category category) =>
             await _categories.InsertOneAsync(category);
 
+         public async Task UpdateCategoryAsync(Category category)
+        {
+            var filter = Builders<Category>.Filter.Eq(c => c.Id, category.Id);
+            var update = Builders<Category>.Update.Set(c => c.Expenses, category.Expenses);
+            await _categories.UpdateOneAsync(filter, update);
+        }
+
     }
 }

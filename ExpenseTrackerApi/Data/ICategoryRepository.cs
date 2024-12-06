@@ -9,5 +9,7 @@ namespace ExpenseTracker.Data
         Task<Category> GetCategoryByIdAsync(string id);
         Task<IEnumerable<Category>> GetAllCategoriesUserAsync(string userId);
         Task CreateCategoryAsync(Category category);
+        Task UpdateCategoryAsync(Category category);
+
     }
 }

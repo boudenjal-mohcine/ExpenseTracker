@@ -25,7 +25,7 @@ namespace ExpenseTracker.Data
         public async Task UpdateUserAsync(User user)
         {
             var filter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
-            var update = Builders<User>.Update.Set(u => u.Categories, user.Categories);
+            var update = Builders<User>.Update.Set(u => u.Categories, user.Categories).Set(u => u.Expenses, user.Expenses);
             await _users.UpdateOneAsync(filter, update);
         }
     }
