@@ -22,4 +22,10 @@ export class ExpenseService {
   addExpense(userId: string, categoryId: string, expense: Expense): Observable<Expense> {
     return this.http.post<Expense>(`${this.baseUrl}/expenses/${userId}/${categoryId}`, expense);
   }
+  
+    deleteExpense(expenseId?: string): Observable<void> {
+      const url = `${this.baseUrl}/expenses/${expenseId}`;
+      return this.http.delete<void>(url);
+    }
+    
 }

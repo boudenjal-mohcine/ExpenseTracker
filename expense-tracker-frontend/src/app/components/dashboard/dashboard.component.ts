@@ -7,8 +7,25 @@ import { Category } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
 import { Expense } from '../../models/expense.model';
 import { ExpenseService } from '../../services/expense.service';
-import { Chart, ArcElement, Tooltip, Legend, Title, CategoryScale, LinearScale, PieController } from 'chart.js';
-Chart.register(ArcElement, Tooltip, Legend, Title, CategoryScale, LinearScale, PieController);
+import {
+  Chart,
+  ArcElement,
+  Tooltip,
+  Legend,
+  Title,
+  CategoryScale,
+  LinearScale,
+  PieController,
+} from 'chart.js';
+Chart.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  Title,
+  CategoryScale,
+  LinearScale,
+  PieController
+);
 
 @Component({
   selector: 'app-dashboard',
@@ -46,14 +63,13 @@ export class DashboardComponent implements OnInit {
     this.setCurrentDateInfo();
     this.loadCategories();
     this.loadExpenses();
-
   }
 
   loadExpenses(): void {
     this.expenseService.getExpenses(this.userId).subscribe(
       (data: Expense[]) => {
-        this.expenses = data; 
-        this.updateChart(); 
+        this.expenses = data;
+        this.updateChart();
       },
       (error) => {
         console.error('Error fetching expenses:', error);
@@ -67,7 +83,7 @@ export class DashboardComponent implements OnInit {
         .getCategories(this.userId)
         .subscribe((categories: Category[]) => {
           this.categories = categories;
-          this.updateChart(); 
+          this.updateChart();
         });
     }
   }
@@ -135,25 +151,34 @@ export class DashboardComponent implements OnInit {
         categoryId: this.selectedCategoryId,
         date: new Date().toISOString(),
       };
-      this.expenseService.addExpense(this.userId, this.selectedCategoryId, newExpense).subscribe(
-        (expense) => {
-          console.log('Expense added successfully:', expense);
-          this.expenses.push(expense);
-          // Manually trigger change detection
-          this.cdr.detectChanges();
-          this.updateChart();
-          this.currentMonthlyExpenses=this.currentMonthlyExpenses+this.amount;
-          this.expensesPercentage=(this.currentMonthlyExpenses/this.maxMonthlyExpenses)*100;
-          this.authService.updateUserData(
-            'currentMonthlyExpenses',
-            this.currentMonthlyExpenses.toString()
-          );
-        },
-        (error) => {
-          console.error('Error adding expense:', error);
-        }
-      );
-      
+      this.expenseService
+        .addExpense(this.userId, this.selectedCategoryId, newExpense)
+        .subscribe(
+          (expense) => {
+            console.log('Expense added successfully:', expense);
+            this.expenses.push(expense);
+            // Manually trigger change detection
+            this.cdr.detectChanges();
+            this.updateChart();
+            this.currentMonthlyExpenses =
+              this.currentMonthlyExpenses + this.amount;
+            this.expensesPercentage =
+              (this.currentMonthlyExpenses / this.maxMonthlyExpenses) * 100;
+            if (this.expensesPercentage >= 100) {
+              alert('You have exceeded your monthly expense limit!');
+            }
+            this.authService.updateUserData(
+              'currentMonthlyExpenses',
+              this.currentMonthlyExpenses.toString()
+            );
+            this.selectedCategoryId = '';
+            this.amount = 0;
+            this.description = '';
+          },
+          (error) => {
+            console.error('Error adding expense:', error);
+          }
+        );
     } else {
       alert('Please fill out all fields.');
     }
@@ -173,46 +198,73 @@ export class DashboardComponent implements OnInit {
 
   // Delete an expense
   deleteExpense(expense: Expense): void {
-    console.log('Deleting expense with ID:', expense?.id);
-    // Implement the logic to delete the expense (e.g., call the delete API and update the list)
+    if (confirm('Are you sure you want to delete this expense?')) {
+      this.expenseService.deleteExpense(expense?.id).subscribe({
+        next: () => {
+          this.expenses = this.expenses.filter((e) => e.id !== expense.id);
+          this.cdr.detectChanges();
+          this.currentMonthlyExpenses =
+            this.currentMonthlyExpenses - expense.amount;
+          this.expensesPercentage =
+            (this.currentMonthlyExpenses / this.maxMonthlyExpenses) * 100;
+          this.authService.updateUserData(
+            'currentMonthlyExpenses',
+            this.currentMonthlyExpenses.toString()
+          );
+          this.updateChart(); // Update the chart after deletion
+        },
+        error: (err) => {
+          console.error('Error deleting expense:', err);
+        },
+      });
+    }
   }
 
   // Function to get the category name by categoryId
   getCategoryName(categoryId: string): string {
-    const category = this.categories.find(c => c.id === categoryId);
+    const category = this.categories.find((c) => c.id === categoryId);
     return category ? category.name : this.selectedCategoryId;
   }
 
   //chart
   updateChart(): void {
-
     const canvas = document.getElementById('pieChart') as HTMLCanvasElement;
 
     // Check if the chart already exists and destroy it
     if (Chart.getChart(canvas)) {
       Chart.getChart(canvas)?.destroy();
     }
-    
+
     if (this.expenses.length > 0 && this.categories.length > 0) {
       // Group expenses by categoryId
-      const categoryExpenses = this.categories.map(category => {
+      const categoryExpenses = this.categories.map((category) => {
         const totalAmount = this.expenses
-          .filter(expense => expense.categoryId === category.id)
+          .filter((expense) => expense.categoryId === category.id)
           .reduce((sum, expense) => sum + expense.amount, 0);
         return { category: category.name, totalAmount };
       });
 
       // Data for the pie chart
       const chartData = {
-        labels: categoryExpenses.map(exp => exp.category),
-        datasets: [{
-          data: categoryExpenses.map(exp => exp.totalAmount),
-          backgroundColor: ['#FF5733', '#33FF57', '#3357FF', '#FFC300', '#FF33A1']
-        }]
+        labels: categoryExpenses.map((exp) => exp.category),
+        datasets: [
+          {
+            data: categoryExpenses.map((exp) => exp.totalAmount),
+            backgroundColor: [
+              '#FF5733',
+              '#33FF57',
+              '#3357FF',
+              '#FFC300',
+              '#FF33A1',
+            ],
+          },
+        ],
       };
 
       // Create or update the pie chart
-      const ctx = (document.getElementById('pieChart') as HTMLCanvasElement).getContext('2d');
+      const ctx = (
+        document.getElementById('pieChart') as HTMLCanvasElement
+      ).getContext('2d');
       if (ctx) {
         new Chart(ctx, {
           type: 'pie',
@@ -228,14 +280,13 @@ export class DashboardComponent implements OnInit {
                   label: (context) => {
                     const value = context.raw;
                     return `${context.label}: $${value}`;
-                  }
-                }
-              }
-            }
-          }
+                  },
+                },
+              },
+            },
+          },
         });
       }
     }
   }
-  
 }
