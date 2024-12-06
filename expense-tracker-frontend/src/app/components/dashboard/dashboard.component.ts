@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
@@ -31,12 +31,14 @@ export class DashboardComponent implements OnInit {
   amount: number = 0;
   description: string = '';
   expenses: Expense[] = [];
+  chartInstance: Chart | null = null;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private categoryService: CategoryService,
-    private expenseService: ExpenseService
+    private expenseService: ExpenseService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -131,9 +133,26 @@ export class DashboardComponent implements OnInit {
         amount: this.amount,
         description: this.description,
         categoryId: this.selectedCategoryId,
-        date: new Date()
+        date: new Date().toISOString(),
       };
-
+      this.expenseService.addExpense(this.userId, this.selectedCategoryId, newExpense).subscribe(
+        (expense) => {
+          console.log('Expense added successfully:', expense);
+          this.expenses.push(expense);
+          // Manually trigger change detection
+          this.cdr.detectChanges();
+          this.updateChart();
+          this.currentMonthlyExpenses=this.currentMonthlyExpenses+this.amount;
+          this.expensesPercentage=(this.currentMonthlyExpenses/this.maxMonthlyExpenses)*100;
+          this.authService.updateUserData(
+            'currentMonthlyExpenses',
+            this.currentMonthlyExpenses.toString()
+          );
+        },
+        (error) => {
+          console.error('Error adding expense:', error);
+        }
+      );
       
     } else {
       alert('Please fill out all fields.');
@@ -153,19 +172,27 @@ export class DashboardComponent implements OnInit {
   }
 
   // Delete an expense
-  deleteExpense(expenseId: string): void {
-    console.log('Deleting expense with ID:', expenseId);
+  deleteExpense(expense: Expense): void {
+    console.log('Deleting expense with ID:', expense?.id);
     // Implement the logic to delete the expense (e.g., call the delete API and update the list)
   }
 
   // Function to get the category name by categoryId
   getCategoryName(categoryId: string): string {
     const category = this.categories.find(c => c.id === categoryId);
-    return category ? category.name : 'Unknown';
+    return category ? category.name : this.selectedCategoryId;
   }
 
   //chart
   updateChart(): void {
+
+    const canvas = document.getElementById('pieChart') as HTMLCanvasElement;
+
+    // Check if the chart already exists and destroy it
+    if (Chart.getChart(canvas)) {
+      Chart.getChart(canvas)?.destroy();
+    }
+    
     if (this.expenses.length > 0 && this.categories.length > 0) {
       // Group expenses by categoryId
       const categoryExpenses = this.categories.map(category => {
@@ -180,7 +207,7 @@ export class DashboardComponent implements OnInit {
         labels: categoryExpenses.map(exp => exp.category),
         datasets: [{
           data: categoryExpenses.map(exp => exp.totalAmount),
-          backgroundColor: ['#FF5733', '#33FF57', '#3357FF', '#FFC300', '#FF33A1'], // Customize colors
+          backgroundColor: ['#FF5733', '#33FF57', '#3357FF', '#FFC300', '#FF33A1']
         }]
       };
 

@@ -18,4 +18,8 @@ export class ExpenseService {
   getExpenses(userId: string): Observable<Expense[]> {
     return this.http.get<Expense[]>(`${this.baseUrl}/expenses/user/${userId}`);
   }
+
+  addExpense(userId: string, categoryId: string, expense: Expense): Observable<Expense> {
+    return this.http.post<Expense>(`${this.baseUrl}/expenses/${userId}/${categoryId}`, expense);
+  }
 }
