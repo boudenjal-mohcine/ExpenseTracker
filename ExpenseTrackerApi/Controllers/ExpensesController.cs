@@ -1,8 +1,6 @@
 using ExpenseTracker.Models;
 using ExpenseTracker.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ExpenseTracker.Controllers
 {
@@ -20,8 +18,6 @@ namespace ExpenseTracker.Controllers
             _expenseService = expenseService;
             _categoryService = categoryService;
             _userService = userService;
-
-
         }
 
         // Endpoint: Get all expenses for a user
@@ -58,7 +54,7 @@ namespace ExpenseTracker.Controllers
             {
                 return NotFound();
             }
-            
+
             var returnExpense = new
             {
                 Id = expense.Id.ToString(),
@@ -100,8 +96,6 @@ namespace ExpenseTracker.Controllers
 
             // Add the expense to the user's list of expenses
             user.Expenses.Add(expense);
-
-            // Optionally add the expense to the category's expense list (if categories track expenses)
             category.Expenses.Add(expense);
 
 
@@ -109,54 +103,62 @@ namespace ExpenseTracker.Controllers
             await _userService.UpdateUserAsync(user);
             await _categoryService.UpdateCategoryAsync(category);
 
-            // Return the expense data with formatted Id and CategoryId
+            // Calculate total monthly expenses
+            var currentMonthExpenses = user.Expenses
+                .Where(e => e.Date.Month == DateTime.Now.Month && e.Date.Year == DateTime.Now.Year)
+                .Sum(e => e.Amount);
+
+            var newTotal = currentMonthExpenses + expense.Amount;
+
+            // Check if the user exceeds the monthly limit
+            bool hasExceededLimit = newTotal > user.MaxMonthlyExpenses;
+
             var returnExpense = new
             {
                 Id = expense.Id.ToString(),
                 expense.Description,
                 expense.Amount,
                 expense.Date,
-                CategoryId = expense.CategoryId?.ToString()
+                CategoryId = expense.CategoryId?.ToString(),
+                expenseState = !hasExceededLimit
             };
 
             return Ok(returnExpense);
-
-
         }
 
 
-    // Endpoint: Delete an expense by ID
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteExpense(string id)
-    {
-        // Fetch the expense by ID to find the associated category and user
-        var expense = await _expenseService.GetExpenseByIdAsync(id);
-        if (expense == null)
+        // Endpoint: Delete an expense by ID
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteExpense(string id)
         {
-            return NotFound("Expense not found.");
+            // Fetch the expense by ID to find the associated category and user
+            var expense = await _expenseService.GetExpenseByIdAsync(id);
+            if (expense == null)
+            {
+                return NotFound("Expense not found.");
+            }
+
+            // Remove the expense from the corresponding category
+            var category = await _categoryService.GetCategoryByIdAsync(expense.CategoryId.ToString());
+            if (category != null)
+            {
+                category.Expenses.RemoveAll(e => e.Id == expense.Id);
+                await _categoryService.UpdateCategoryAsync(category);
+            }
+
+            // Remove the expense from the corresponding user
+            var user = await _userService.GetUserByIdAsync(expense.UserId);
+            if (user != null)
+            {
+                user.Expenses.RemoveAll(e => e.Id == expense.Id);
+                await _userService.UpdateUserAsync(user);
+            }
+
+            // Delete the expense from the expense service/database
+            await _expenseService.DeleteExpenseAsync(id);
+
+            return NoContent();
         }
-
-        // Remove the expense from the corresponding category
-        var category = await _categoryService.GetCategoryByIdAsync(expense.CategoryId.ToString());
-        if (category != null)
-        {   
-            category.Expenses.RemoveAll(e => e.Id == expense.Id);
-            await _categoryService.UpdateCategoryAsync(category);
-        }
-
-        // Remove the expense from the corresponding user
-        var user = await _userService.GetUserByIdAsync(expense.UserId);
-        if (user != null)
-        {
-            user.Expenses.RemoveAll(e => e.Id == expense.Id);
-            await _userService.UpdateUserAsync(user);
-        }
-
-        // Delete the expense from the expense service/database
-        await _expenseService.DeleteExpenseAsync(id);
-
-        return NoContent();
-    }
 
     }
 }
