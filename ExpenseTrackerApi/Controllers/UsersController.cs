@@ -45,6 +45,7 @@ namespace ExpenseTracker.Controllers
                 return Unauthorized("Invalid username or password.");
             }
 
+            var CurrentMonthlyExpenses = existingUser.Expenses?.Sum(expense => expense.Amount);
             return Ok(new
             {
                 Message = "Login successful",
@@ -52,7 +53,14 @@ namespace ExpenseTracker.Controllers
                 {
                     Id = existingUser.Id.ToString(),
                     Username = existingUser.Username,
-                    Expenses = existingUser.Expenses
+                    Expenses = existingUser.Expenses,
+                    MaxMonthlyExpenses = existingUser.MaxMonthlyExpenses,
+                    CurrentMonthlyExpenses = CurrentMonthlyExpenses ?? 0,
+                    Categories = existingUser.Categories.Select(category => new
+                    {
+                        Id = category.Id.ToString(),
+                        category.Name,
+                    }).ToList()
                 }
             });
         }

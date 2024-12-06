@@ -17,8 +17,8 @@ namespace ExpenseTracker.Services
         public async Task<Category> GetCategoryByIdAsync(string id) =>
             await _categoryRepository.GetCategoryByIdAsync(id);
 
-        public async Task<IEnumerable<Category>> GetAllCategoriesAsync() =>
-            await _categoryRepository.GetAllCategoriesAsync();
+        public async Task<IEnumerable<Category>> GetAllCategoriesUserAsync(string userId) =>
+            await _categoryRepository.GetAllCategoriesUserAsync(userId);
 
         public async Task CreateCategoryAsync(Category category) =>
             await _categoryRepository.CreateCategoryAsync(category);

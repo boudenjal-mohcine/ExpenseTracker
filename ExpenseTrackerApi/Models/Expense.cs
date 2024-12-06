@@ -12,14 +12,14 @@ namespace ExpenseTracker.Models
 
         public decimal Amount { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public DateTime Date { get; set; }
 
         [BsonRepresentation(BsonType.ObjectId)]
-        public string CategoryId { get; set; }
+        public string? CategoryId { get; set; }
 
         [BsonIgnore]
-        public Category Category { get; set; }
+        public Category? Category { get; set; }
     }
 }

@@ -23,5 +23,10 @@ namespace ExpenseTracker.Services
         public async Task CreateUserAsync(User user){
             await _userRepository.CreateUserAsync(user);
         }
+
+         public async Task UpdateUserAsync(User user)
+        {
+            await _userRepository.UpdateUserAsync(user);
+        }
     }
 }

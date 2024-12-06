@@ -17,10 +17,16 @@ namespace ExpenseTracker.Data
         public async Task<Category> GetCategoryByIdAsync(string id) =>
             await _categories.Find(category => category.Id.ToString() == id).FirstOrDefaultAsync();
 
-        public async Task<IEnumerable<Category>> GetAllCategoriesAsync() =>
-            await _categories.Find(_ => true).ToListAsync();
+        public async Task<IEnumerable<Category>> GetAllCategoriesUserAsync(string userId)
+        {
+            return await _categories
+                         .Find(category => category.UserId == userId) 
+                         .ToListAsync(); 
+        }
+
 
         public async Task CreateCategoryAsync(Category category) =>
             await _categories.InsertOneAsync(category);
+
     }
 }

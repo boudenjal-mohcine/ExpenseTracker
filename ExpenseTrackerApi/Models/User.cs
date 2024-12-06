@@ -10,12 +10,13 @@ namespace ExpenseTracker.Models
         [BsonId]
         public ObjectId Id { get; set; }
 
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         public decimal MaxMonthlyExpenses { get; set; }
 
         public List<Expense> Expenses { get; set; } = new List<Expense>();
+        public List<Category> Categories { get; set; } = new List<Category>();
     }
 }

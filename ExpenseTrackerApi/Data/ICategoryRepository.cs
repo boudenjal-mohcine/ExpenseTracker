@@ -7,7 +7,7 @@ namespace ExpenseTracker.Data
     public interface ICategoryRepository
     {
         Task<Category> GetCategoryByIdAsync(string id);
-        Task<IEnumerable<Category>> GetAllCategoriesAsync();
+        Task<IEnumerable<Category>> GetAllCategoriesUserAsync(string userId);
         Task CreateCategoryAsync(Category category);
     }
 }
